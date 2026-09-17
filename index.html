@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Song Lab — Laboratory of Anatomical Immunity</title>
+<meta name="description" content="Anatomical immunity: how the architecture of drainage and neuro-immune circuits shapes immune outcomes in the brain and eye.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   PALETTE — warm paper / soft ink / muted mauve accent
+   ============================================================ */
+:root{
+  --paper:#F3F1EC; --paper-2:#E9E6DE; --paper-3:#EEEBE4;
+  --ink:#23211E; --ink-soft:#4A4640; --ink-faint:#827B72;
+  --accent:#8B5E7E; --accent-deep:#6B4560;
+  --rule:#D6D1C7; --rule-soft:#E2DDD3;
+
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --measure:66ch; --maxw:1040px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#211E20; --paper-2:#29252A; --paper-3:#2E2930;
+    --ink:#EDE7E2; --ink-soft:#C6BDBB; --ink-faint:#948B8C;
+    --accent:#BE90B1; --accent-deep:#D3AAC7;
+    --rule:#3B353A; --rule-soft:#322D33;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#211E20; --paper-2:#29252A; --paper-3:#2E2930;
+  --ink:#EDE7E2; --ink-soft:#C6BDBB; --ink-faint:#948B8C;
+  --accent:#BE90B1; --accent-deep:#D3AAC7;
+  --rule:#3B353A; --rule-soft:#322D33;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} }
+
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-size:1.075rem;line-height:1.62;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(20px,5vw,56px);}
+a{color:var(--accent);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.06em;}
+a:hover{color:var(--accent-deep);}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:1px;}
+
+/* ============ TOP BAR ============ */
+.topbar{border-bottom:1px solid var(--rule);background:var(--paper);position:sticky;top:0;z-index:20;}
+.topbar .wrap{display:flex;align-items:baseline;justify-content:space-between;gap:20px;padding:16px 0;flex-wrap:wrap;}
+.brand{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink);}
+.brand .name{font-family:var(--serif);font-weight:600;font-size:1.35rem;line-height:1;letter-spacing:.01em;}
+.brand .unit{font-family:var(--mono);font-size:.7rem;color:var(--ink-faint);}
+.brand:hover .name{color:var(--accent);}
+nav.main{display:flex;gap:24px;font-family:var(--mono);font-size:.8rem;flex-wrap:wrap;}
+nav.main a{color:var(--ink-soft);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;transition:color .15s,border-color .15s;}
+nav.main a:hover{color:var(--ink);border-color:var(--rule);}
+nav.main a.active{color:var(--accent);border-color:var(--accent);}
+.theme-toggle{font-family:var(--mono);font-size:.92rem;line-height:1;background:none;border:1px solid var(--rule);color:var(--ink-soft);border-radius:6px;padding:5px 8px;cursor:pointer;align-self:center;transition:color .15s,border-color .15s;}
+.theme-toggle:hover{color:var(--ink);border-color:var(--ink-faint);}
+
+/* ============ SECTION RHYTHM ============ */
+.section{padding:clamp(54px,8vw,100px) 0;border-bottom:1px solid var(--rule);scroll-margin-top:72px;}
+.section:last-of-type{border-bottom:none;}
+h2.section-title{font-family:var(--serif);font-weight:600;font-size:clamp(1.6rem,3vw,2.15rem);line-height:1.1;margin:0 0 10px;letter-spacing:-.01em;}
+.lede{max-width:var(--measure);color:var(--ink-soft);margin:0 0 40px;font-size:1.12rem;}
+
+/* ============ HERO ============ */
+.hero{padding:clamp(56px,9vw,116px) 0 clamp(48px,7vw,84px);border-bottom:1px solid var(--rule);}
+.hero-grid{display:grid;grid-template-columns:1.4fr .85fr;gap:clamp(24px,5vw,64px);align-items:center;}
+.hero-kicker{font-family:var(--mono);font-size:.8rem;line-height:1.8;color:var(--ink-faint);margin:0 0 22px;}
+.hero h1{font-family:var(--serif);font-weight:500;letter-spacing:-.015em;font-size:clamp(2.1rem,5vw,3.7rem);line-height:1.07;margin:0 0 26px;max-width:16ch;}
+.hero h1 em{font-style:italic;color:var(--accent);font-weight:500;}
+.hero p.intro{max-width:52ch;color:var(--ink-soft);font-size:1.15rem;margin:0 0 30px;}
+.pi-line{font-family:var(--mono);font-size:.84rem;line-height:1.8;color:var(--ink);}
+.pi-line .role{color:var(--ink-faint);}
+.motif{width:100%;height:auto;max-width:340px;justify-self:end;}
+.motif .edge{fill:none;stroke:var(--ink);stroke-width:1.1;opacity:.55;}
+.motif .edge.path{stroke:var(--accent);stroke-width:1.7;opacity:.95;}
+.motif .node{fill:var(--paper);stroke:var(--ink);stroke-width:1.4;}
+.motif .node.mauve{stroke:var(--accent);stroke-width:1.7;}
+.motif .node.mauve.fill{fill:var(--accent);}
+@media (prefers-reduced-motion:no-preference){
+  .motif .edge{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 1.5s ease forwards;}
+  .motif .edge.path{animation-duration:.9s;}
+  .motif .node{opacity:0;animation:pop .5s ease forwards;animation-delay:1.5s;}
+  @keyframes draw{to{stroke-dashoffset:0;}}
+  @keyframes pop{to{opacity:1;}}
+}
+
+/* ============ RESEARCH ============ */
+.themes{display:flex;flex-direction:column;}
+.theme{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:clamp(16px,4vw,56px);padding:32px 0;border-top:1px solid var(--rule-soft);}
+.theme:first-child{border-top:none;padding-top:0;}
+.theme h3{font-family:var(--serif);font-weight:600;font-size:1.4rem;line-height:1.15;margin:0;letter-spacing:-.01em;}
+.theme .body{color:var(--ink-soft);margin:0 0 14px;max-width:60ch;}
+.theme .tags{font-family:var(--mono);font-size:.74rem;color:var(--ink-faint);}
+.theme .tags span::after{content:"  /  ";color:var(--rule);}
+.theme .tags span:last-child::after{content:"";}
+
+/* ============ PEOPLE ============ */
+.pi-card{padding:26px;background:var(--paper-3);border:1px solid var(--rule);margin-bottom:40px;}
+.pi-main{display:grid;grid-template-columns:190px 1fr;gap:30px;align-items:start;}
+.pi-card .portrait{width:190px;height:190px;padding:10px;border:1px solid var(--rule);background:var(--paper-2);display:grid;place-items:center;font-family:var(--serif);font-size:3.2rem;color:var(--ink-faint);overflow:hidden;}
+.pi-card h3{font-family:var(--serif);font-size:1.5rem;font-weight:600;margin:0 0 2px;}
+.pi-card .role{font-family:var(--mono);font-size:.78rem;color:var(--accent);margin:0 0 12px;}
+.pi-card p{margin:0;color:var(--ink-soft);max-width:60ch;}
+.pmail{display:inline-block;margin-top:14px;font-family:var(--mono);font-size:.76rem;}
+
+.people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:26px 30px;}
+.person{display:flex;flex-direction:column;gap:8px;}
+.person .tile{position:relative;width:100%;aspect-ratio:1/1;padding:10px;border:1px solid var(--rule);background:var(--paper-2);display:grid;place-items:center;font-family:var(--serif);font-size:1.9rem;color:var(--ink-faint);overflow:hidden;}
+.person .reveal{position:absolute;inset:0;display:flex;align-items:flex-end;padding:16px;
+  background:var(--accent);
+  background:linear-gradient(to top, var(--accent) 0%, color-mix(in srgb, var(--accent) 78%, transparent) 55%, transparent 100%);
+  color:#FBF6F1;font-family:var(--serif);font-size:.96rem;line-height:1.35;
+  opacity:0;transition:opacity .2s ease;pointer-events:none;}
+.person:hover .reveal,.person .tile:focus .reveal,.person .tile:focus-within .reveal{opacity:1;}
+@media (prefers-reduced-motion:reduce){ .person .reveal{transition:none;} }
+.person .pname{font-family:var(--serif);font-size:1.08rem;font-weight:600;line-height:1.2;margin-top:2px;}
+.person .prole{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);line-height:1.4;}
+.person .pmail{margin-top:2px;font-size:.72rem;}
+.person .blurb-static{display:none;margin:4px 0 0;font-size:.92rem;color:var(--ink-soft);line-height:1.35;}
+/* touch devices: no hover — show the info as text instead of an overlay */
+@media (hover:none){
+  .person .reveal{display:none;}
+  .person .blurb-static{display:block;}
+}
+.join-note{margin-top:40px;font-size:1.05rem;color:var(--ink-soft);max-width:var(--measure);}
+
+/* ============ ALUMNI ============ */
+.alumni-head{font-family:var(--serif);font-weight:600;font-size:1.3rem;letter-spacing:-.01em;margin:48px 0 4px;}
+.alumni-sub{font-family:var(--mono);font-size:.76rem;color:var(--ink-faint);margin:0 0 8px;}
+.alumni{list-style:none;margin:0;padding:0;max-width:var(--measure);}
+.alumni li{padding:12px 0;border-top:1px solid var(--rule-soft);line-height:1.4;}
+.alumni li:first-child{border-top:none;}
+.alumni .an{font-family:var(--serif);font-size:1.08rem;font-weight:600;color:var(--ink);}
+.alumni .anote{font-family:var(--mono);font-size:.78rem;color:var(--ink-faint);}
+
+/* ============ SUPPORT / FUNDERS ============ */
+.funders{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:20px;max-width:900px;}
+.funder{display:grid;place-items:center;text-align:center;min-height:96px;padding:20px;
+  border:1px solid var(--rule);background:var(--paper-3);text-decoration:none;
+  font-family:var(--serif);font-size:1.02rem;color:var(--ink-soft);line-height:1.3;
+  transition:border-color .15s,color .15s;}
+a.funder:hover{border-color:var(--accent);color:var(--ink);}
+.funder img{max-width:100%;max-height:56px;height:auto;
+  filter:grayscale(1);opacity:.75;transition:filter .15s,opacity .15s;}
+a.funder:hover img{filter:grayscale(0);opacity:1;}
+
+/* ============ RULES OF ENGAGEMENT ============ */
+.rules{list-style:none;margin:0;padding:0;max-width:62ch;}
+.rules li{display:grid;grid-template-columns:14px 1fr;gap:16px;align-items:start;padding:16px 0;border-top:1px solid var(--rule-soft);}
+.rules li:first-child{border-top:none;}
+.rules .mark{width:9px;height:9px;border-radius:50%;background:var(--accent);margin-top:.5em;}
+.rules .text{font-family:var(--mono);font-size:.98rem;line-height:1.55;color:var(--ink);}
+.rules-credit{font-family:var(--mono);font-size:.78rem;color:var(--ink-faint);margin:30px 0 0;}
+
+/* ============ PUBLICATIONS ============ */
+.pub-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:30px;}
+.pub-head a{font-family:var(--mono);font-size:.82rem;}
+.pubs{list-style:none;margin:0;padding:0;}
+.pub{display:grid;grid-template-columns:5.2rem 1fr;gap:22px;padding:20px 0;border-top:1px solid var(--rule-soft);}
+.pub:first-child{border-top:none;}
+.pub .meta{font-family:var(--mono);font-size:.78rem;line-height:1.5;color:var(--ink-faint);padding-top:2px;}
+.pub .meta .venue{color:var(--accent);display:block;}
+.pub .cite{margin:0;}
+.pub .title{font-weight:600;}
+.pub .authors{color:var(--ink-soft);}
+.pub .authors b{color:var(--ink);font-weight:600;}
+
+/* ============ NEWS ============ */
+.news{list-style:none;margin:0;padding:0 10px 0 0;max-height:33rem;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--rule) transparent;}
+.news::-webkit-scrollbar{width:8px;}
+.news::-webkit-scrollbar-thumb{background:var(--rule);border-radius:4px;}
+.news::-webkit-scrollbar-track{background:transparent;}
+.news li{display:grid;grid-template-columns:6.5rem 1fr;gap:22px;padding:16px 0;border-top:1px solid var(--rule-soft);}
+.news li:first-child{border-top:none;}
+.news .date{font-family:var(--mono);font-size:.76rem;color:var(--ink-faint);padding-top:3px;}
+.news .item{margin:0;color:var(--ink-soft);max-width:var(--measure);}
+
+/* ============ CONTACT ============ */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,64px);}
+.contact-block h3{font-family:var(--serif);font-size:1.15rem;margin:0 0 10px;font-weight:600;}
+.contact-block .mono{font-family:var(--mono);font-size:.86rem;line-height:1.9;color:var(--ink);}
+.contact-block .mono .k{color:var(--ink-faint);}
+.contact-block p{color:var(--ink-soft);max-width:52ch;margin:0;}
+
+/* ============ FOOTER ============ */
+footer{padding:34px 0;}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:.76rem;color:var(--ink-faint);}
+footer a{color:var(--ink-faint);}
+footer a:hover{color:var(--accent);}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:820px){
+  .hero-grid{grid-template-columns:1fr;}
+  .motif{grid-row:1;justify-self:start;max-width:270px;margin-bottom:8px;}
+  .theme{grid-template-columns:1fr;gap:10px;}
+  .contact-grid{grid-template-columns:1fr;}
+}
+@media (max-width:560px){
+  .topbar .wrap{flex-direction:column;align-items:flex-start;gap:12px;}
+  .pi-main{grid-template-columns:1fr;}
+  .pi-card .portrait{width:150px;height:150px;font-size:2.6rem;}
+  .people-grid{grid-template-columns:repeat(2,1fr);gap:20px 16px;}
+  .person .tile{padding:14px;font-size:1.5rem;}
+  .person .pname{font-size:1rem;}
+  .pub{grid-template-columns:1fr;gap:6px;}
+  .pub .meta{padding-top:0;}
+  .pub .meta .venue{display:inline;}
+  .news li{grid-template-columns:1fr;gap:2px;}
+  .rules .text{font-size:.9rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <span class="name" data-lab-name></span>
+      <span class="unit" data-lab-unit></span>
+    </a>
+    <nav class="main" aria-label="Primary">
+      <a href="#research">Research</a>
+      <a href="#people">People</a>
+      <a href="#culture">Culture</a>
+      <a href="#publications">Publications</a>
+      <a href="#news">News</a>
+      <a href="#support">Support</a>
+      <a href="#contact">Contact</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch between light and dark"></button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="hero-kicker" data-lab-unit-long></p>
+        <h1 data-thesis></h1>
+        <p class="intro" data-intro></p>
+        <p class="pi-line" data-pi></p>
+      </div>
+      <svg class="motif" viewBox="52 100 256 250" aria-hidden="true" fill="none">
+        <!-- drainage tree: branches collecting toward one root -->
+        <path class="edge" d="M180 296 C 168 268, 140 240, 120 212"/>
+        <path class="edge" d="M120 212 C 104 184, 84 156, 72 128"/>
+        <path class="edge" d="M120 212 C 130 182, 142 150, 148 120"/>
+        <path class="edge" d="M240 212 C 256 184, 276 156, 288 128"/>
+        <path class="edge" d="M180 296 L180 334"/>
+        <!-- the mauve route: one tip -> junction -> root -->
+        <path class="edge path" d="M212 120 C 218 150, 230 182, 240 212" style="animation-delay:2.4s"/>
+        <path class="edge path" d="M240 212 C 220 240, 192 268, 180 296" style="animation-delay:3.5s"/>
+        <!-- black nodes -->
+        <circle class="node" cx="120" cy="212" r="6"/>
+        <circle class="node" cx="72"  cy="128" r="5.5"/>
+        <circle class="node" cx="148" cy="120" r="5.5"/>
+        <circle class="node" cx="288" cy="128" r="5.5"/>
+        <!-- three mauve dots: filled, filled, open -->
+        <circle class="node mauve fill" cx="212" cy="120" r="7" style="animation-delay:2.2s"/>
+        <circle class="node mauve fill" cx="240" cy="212" r="7" style="animation-delay:3.3s"/>
+        <circle class="node mauve"      cx="180" cy="296" r="8" style="animation-delay:4.4s"/>
+      </svg>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============ RESEARCH ============ -->
+  <section class="section" id="research">
+    <div class="wrap">
+      <h2 class="section-title">Research</h2>
+      <p class="lede" data-research-lede></p>
+      <div class="themes" data-themes></div>
+    </div>
+  </section>
+
+  <!-- ============ PEOPLE ============ -->
+  <section class="section" id="people">
+    <div class="wrap">
+      <h2 class="section-title">People</h2>
+      <div data-pi-card></div>
+      <div class="people-grid" data-people></div>
+      <p class="join-note" data-join></p>
+
+      <h3 class="alumni-head" data-alumni-title></h3>
+      <p class="alumni-sub" data-alumni-sub></p>
+      <ul class="alumni" data-alumni></ul>
+    </div>
+  </section>
+
+  <!-- ============ RULES OF ENGAGEMENT ============ -->
+  <section class="section" id="culture">
+    <div class="wrap">
+      <h2 class="section-title" data-culture-title></h2>
+      <p class="lede" data-culture-intro></p>
+      <ul class="rules" data-rules></ul>
+      <p class="rules-credit" data-culture-credit></p>
+    </div>
+  </section>
+
+  <!-- ============ PUBLICATIONS ============ -->
+  <section class="section" id="publications">
+    <div class="wrap">
+      <div class="pub-head">
+        <h2 class="section-title" style="margin:0">Selected papers</h2>
+        <a data-scholar href="#">Full list on Google Scholar</a>
+      </div>
+      <ol class="pubs" data-pubs></ol>
+    </div>
+  </section>
+
+  <!-- ============ NEWS ============ -->
+  <section class="section" id="news">
+    <div class="wrap">
+      <h2 class="section-title">News</h2>
+      <ul class="news" data-news></ul>
+    </div>
+  </section>
+
+  <!-- ============ SUPPORT ============ -->
+  <section class="section" id="support">
+    <div class="wrap">
+      <h2 class="section-title" data-support-title></h2>
+      <div class="funders" data-funders></div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="section" id="contact">
+    <div class="wrap">
+      <h2 class="section-title">Contact &amp; join us</h2>
+      <div class="contact-grid">
+        <div class="contact-block">
+          <h3>Where we are</h3>
+          <p class="mono" data-address></p>
+        </div>
+        <div class="contact-block">
+          <h3>Openings</h3>
+          <p data-openings></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span data-footer-left></span>
+    <span>Static site — no tracking.</span>
+  </div>
+</footer>
+
+<script>
+/* ================================================================
+   ▓▓▓  EDIT YOUR CONTENT HERE  ▓▓▓
+   Everything the site shows lives in this one object. Change the
+   text, add or remove people/rules/papers, and the page updates.
+   You never need to touch the HTML or CSS above.
+   ================================================================ */
+const SITE = {
+
+  /* — Identity — */
+  labName:   "Song Lab",
+  tagline:   "Laboratory of Anatomical Immunity",
+  unitLong:  "Yale School of Medicine\nImmunobiology / Ophthalmology & Visual Sciences",
+
+  /* — Hero — (wrap accent words in <em>…</em>) */
+  thesis: "Immunity in the brain and eye is <em>built</em>, not just programmed.",
+  intro:  "We study the nervous system's defenses through the lens of anatomical immunity: how meningeal and optic-nerve lymphatics, drainage routes, and neuro-immune circuit wiring set the outcome of immune responses in the brain and the eye — and how re-engineering that anatomy can treat disease.",
+  pi:     "Eric Song, MD, PhD\nPrincipal Investigator · Assistant Professor",
+
+  scholarUrl: "https://scholar.google.com/",
+
+  /* — Research — */
+  researchLede: "Three questions organize the lab. Each sits at the seam between how the body is built and how it defends itself.",
+  themes: [
+    { title:"Anatomical immunity",
+      body:"Immune privilege in the brain and eye is not the absence of immunity — it is a consequence of anatomy. We map how drainage routes and barrier structure govern which antigens are seen, where, and with what result.",
+      tags:["Lymphatics","Immune privilege","CNS barriers"] },
+    { title:"Engineering lymphatic drainage",
+      body:"If anatomy sets the rules, rebuilding anatomy can change the outcome. Our LS-VEGF-C platform grows and steers lymphatic drainage as a therapeutic strategy — with glaucoma and CNS clearance as first targets.",
+      tags:["LS-VEGF-C","Glaucoma","Drug delivery"] },
+    { title:"The ocular–brain immune axis",
+      body:"The eye is an accessible window onto the brain. We trace the shared immune circuitry that links the two, asking how a response mounted in one compartment is licensed — or suppressed — in the other.",
+      tags:["Neuro-immunology","Optic nerve","Prime & license"] }
+  ],
+
+  /* — People — ('photo' optional; omit for an initial tile) */
+  pi_card:{ initials:"E", name:"Eric Song", role:"Principal Investigator",
+    email:"[email]@yale.edu",
+    bio:"Engineer-turned-immunologist. Trained with Akiko Iwasaki (immunity in the brain and eye) and in drug delivery with Mark Saltzman and Justin Hanes; chief resident in ophthalmology. The lab is where those threads converge." },
+  people:[
+    { initials:"JK", name:"Jeongsoo Kim", role:"Postdoctoral Fellow",
+      email:"jeongsoo.kim@yale.edu",
+      blurb:"Leads the lab's brain-tumor immunology projects." },
+    { initials:"—", name:"Open position", role:"Graduate Student",
+      blurb:"Rotation and thesis spots open — see Contact." },
+    { initials:"—", name:"Open position", role:"Research Assistant",
+      blurb:"Full-time RA position open — see Contact." },
+    { initials:"—", name:"Open position", role:"Postdoctoral Fellow",
+      blurb:"Postdoc positions open — email Eric to start a conversation." }
+  ],
+  join:"We are recruiting curious people at every stage — especially those who like living between fields (immunology, engineering, ophthalmology). If the questions above pull at you, get in touch.",
+
+  /* — Alumni — one line each: 'name' + optional 'note' (years, where they went now) */
+  alumniTitle:"Alumni",
+  alumniSub:"Where they are now",
+  alumni:[
+    { name:"[Name]", note:"Postdoc, 2024–2026 — now Assistant Professor, [University]" },
+    { name:"[Name]", note:"PhD student — now Postdoctoral Fellow, [Institute]" },
+    { name:"[Name]", note:"Research Assistant — now MD/PhD student, [Program]" }
+  ],
+
+  /* — Rules of engagement — */
+  cultureTitle:  "Rules of engagement",
+  cultureIntro:  "How we work together, and what we expect of everyone in the lab.",
+  cultureRules: [
+    "Set the bar high.",
+    "Share problems, suggest solutions.",
+    "Adhere to the doctrine of no surprises.",
+    "When in doubt, consult.",
+    "If you are typing more than one paragraph, pick up the phone.",
+    "View debate as healthy — then honor decisions.",
+    "Exercise your sense of humor."
+  ],
+  cultureCredit: "Passed down to us by our own Dean, Nancy Brown.",
+
+  /* — Publications — SAMPLE entries; replace with real citations.
+       Wrap your own name in <b>…</b>. */
+  publications:[
+    { year:"2024", venue:"Nature", title:"Meningeal and optic-nerve lymphatics coordinate immune surveillance of the eye and brain", authors:"<b>Song E</b>, Colleague A, Colleague B, Iwasaki A" },
+    { year:"2020", venue:"Nature", title:"Engineered lymphatic drainage licenses antitumor immunity in the brain", authors:"<b>Song E</b>, Colleague C, Saltzman WM, Iwasaki A" },
+    { year:"2023", venue:"J. Exp. Med.", title:"A sample second-tier citation to show how shorter venue names sit in the column", authors:"Colleague D, <b>Song E</b>" },
+    { year:"2021", venue:"Sci. Transl. Med.", title:"Nanoparticle-based delivery to the posterior segment of the eye", authors:"<b>Song E</b>, Hanes J" }
+  ],
+
+  /* — News — */
+  news:[
+    { date:"Sep 2026", item:"The lab officially opens at Yale. Welcome to everyone joining." },
+    { date:"Jul 2026", item:"New preprint on optic-nerve lymphatics posted — link on bioRxiv." },
+    { date:"Apr 2026", item:"Eric gives an invited talk on anatomical immunity." },
+    { date:"Mar 2026", item:"[Sample] Lab member presents a poster at the ARVO annual meeting." },
+    { date:"Feb 2026", item:"[Sample] Review article accepted at a leading immunology journal." },
+    { date:"Jan 2026", item:"[Sample] Grant awarded to support the LS-VEGF-C program." },
+    { date:"Dec 2025", item:"[Sample] Collaboration begins with a CNS drainage imaging group." },
+    { date:"Nov 2025", item:"[Sample] Welcome to a new graduate student joining the lab." },
+    { date:"Oct 2025", item:"[Sample] Talk on the ocular–brain immune axis at a departmental seminar." },
+    { date:"Sep 2025", item:"[Sample] First lab retreat — planning the year ahead." },
+    { date:"Aug 2025", item:"[Sample] Older entries scroll below this line — try scrolling the list." },
+    { date:"Jul 2025", item:"[Sample] The list holds as many entries as you add." }
+  ],
+
+  /* — Support / funders —
+       For each funder: 'name' always shows. Add 'logo' with an image
+       path (e.g. "logos/nih.svg") once you have the files and it will
+       show the logo instead of the name. 'url' is optional. */
+  supportTitle:"Generous support from",
+  funders:[
+    { name:"National Eye Institute, NIH", url:"" },
+    { name:"Research to Prevent Blindness", url:"" },
+    { name:"Burroughs Wellcome Fund", url:"" },
+    { name:"[Add a funder]", url:"" }
+  ],
+
+  /* — Contact — */
+  address:[
+    ["Lab",   "[Building / Room]"],
+    ["",      "300 Cedar Street"],
+    ["",      "New Haven, CT 06520"],
+    ["Email", "[email]@yale.edu"]
+  ],
+  openings:"Prospective postdocs: email a CV and a short note on what you want to work on. Yale graduate students in immunobiology, INP, and BME are welcome to rotate.",
+
+  footerLeft:"© 2026 Song Lab · Laboratory of Anatomical Immunity · Yale School of Medicine"
+};
+
+/* ================================================================
+   ▓▓▓  RENDERING — you shouldn't need to change anything below  ▓▓▓
+   ================================================================ */
+const $ = s => document.querySelector(s);
+const set = (sel,html) => { const el=$(sel); if(el) el.innerHTML = html; };
+const nl2br = s => s.replace(/\n/g,"<br>");
+
+document.querySelectorAll("[data-lab-name]").forEach(e=>e.textContent=SITE.labName);
+document.querySelectorAll("[data-lab-unit]").forEach(e=>e.textContent=SITE.tagline);
+set("[data-lab-unit-long]", nl2br(SITE.unitLong));
+set("[data-thesis]", SITE.thesis);
+set("[data-intro]", SITE.intro);
+set("[data-pi]", nl2br(SITE.pi.replace(/\n(.*)$/, "\n<span class='role'>$1</span>")));
+set("[data-research-lede]", SITE.researchLede);
+set("[data-join]", SITE.join);
+set("[data-alumni-title]", SITE.alumniTitle || "Alumni");
+set("[data-alumni-sub]", SITE.alumniSub || "");
+set("[data-alumni]", (SITE.alumni||[]).map(a=>`
+  <li><span class="an">${a.name}</span>${a.note?` <span class="anote">— ${a.note}</span>`:""}</li>`).join(""));
+set("[data-culture-title]", SITE.cultureTitle);
+set("[data-culture-intro]", SITE.cultureIntro);
+set("[data-culture-credit]", SITE.cultureCredit);
+set("[data-openings]", SITE.openings);
+set("[data-footer-left]", SITE.footerLeft);
+const sch=$("[data-scholar]"); if(sch) sch.href=SITE.scholarUrl;
+
+set("[data-themes]", SITE.themes.map(t=>`
+  <div class="theme">
+    <h3>${t.title}</h3>
+    <div>
+      <p class="body">${t.body}</p>
+      <p class="tags">${t.tags.map(x=>`<span>${x}</span>`).join("")}</p>
+    </div>
+  </div>`).join(""));
+
+const pc=SITE.pi_card;
+set("[data-pi-card]", `
+  <div class="pi-card">
+    <div class="pi-main">
+      <div class="portrait">${pc.photo?`<img src="${pc.photo}" alt="${pc.name}" style="width:100%;height:100%;object-fit:cover">`:pc.initials}</div>
+      <div class="pi-text">
+        <h3>${pc.name}</h3>
+        <p class="role">${pc.role}</p>
+        <p>${pc.bio}</p>
+        ${pc.email?`<a class="pmail" href="mailto:${pc.email}">${pc.email}</a>`:""}
+      </div>
+    </div>
+  </div>`);
+
+set("[data-people]", SITE.people.map(p=>`
+  <div class="person">
+    <div class="tile"${p.blurb?' tabindex="0"':''}>
+      ${p.photo?`<img src="${p.photo}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover">`:p.initials}
+      ${p.blurb?`<span class="reveal">${p.blurb}</span>`:""}
+    </div>
+    <div class="pname">${p.name}</div>
+    <div class="prole">${p.role}</div>
+    ${p.email?`<a class="pmail" href="mailto:${p.email}">${p.email}</a>`:""}
+    ${p.blurb?`<p class="blurb-static">${p.blurb}</p>`:""}
+  </div>`).join(""));
+
+set("[data-rules]", SITE.cultureRules.map(r=>`
+  <li><span class="mark" aria-hidden="true"></span><span class="text">${r}</span></li>`).join(""));
+
+set("[data-pubs]", SITE.publications.map(p=>`
+  <li class="pub">
+    <div class="meta">${p.year}<span class="venue">${p.venue}</span></div>
+    <p class="cite"><span class="title">${p.title}.</span> <span class="authors">${p.authors}</span></p>
+  </li>`).join(""));
+
+set("[data-news]", SITE.news.map(n=>`
+  <li><span class="date">${n.date}</span><p class="item">${n.item}</p></li>`).join(""));
+
+set("[data-support-title]", SITE.supportTitle);
+set("[data-funders]", (SITE.funders||[]).map(f=>{
+  const inner = f.logo ? `<img src="${f.logo}" alt="${f.name}">` : `<span>${f.name}</span>`;
+  return f.url
+    ? `<a class="funder" href="${f.url}" target="_blank" rel="noopener">${inner}</a>`
+    : `<div class="funder">${inner}</div>`;
+}).join(""));
+
+set("[data-address]", SITE.address.map(([k,v])=>
+  `<span class="k">${k?k+":&nbsp;":"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"}</span>${v}`).join("<br>"));
+
+document.querySelectorAll(".motif .edge").forEach((p,i)=>{
+  p.style.setProperty("--len", p.getTotalLength());
+  if(!p.classList.contains("path")) p.style.animationDelay=(i*0.09)+"s";
+});
+
+/* nav highlight — marks the section currently under the top bar */
+(function(){
+  const links=[...document.querySelectorAll("nav.main a[href^='#']")];
+  const items=links
+    .map(a=>({a, el:document.getElementById(a.getAttribute("href").slice(1))}))
+    .filter(x=>x.el);
+  if(!items.length) return;
+
+  const bar=document.querySelector(".topbar");
+  let ticking=false;
+
+  function update(){
+    ticking=false;
+    const offset=(bar?bar.offsetHeight:0)+24;   // just below the sticky bar
+    const y=window.scrollY||window.pageYOffset;
+    const atBottom = y+window.innerHeight >= document.documentElement.scrollHeight-2;
+
+    let current=null;
+    if(atBottom){
+      current=items[items.length-1];            // bottom of page → last section
+    }else{
+      for(const it of items){                   // last section whose top has passed
+        if(it.el.getBoundingClientRect().top<=offset) current=it; else break;
+      }
+    }
+    links.forEach(a=>a.classList.remove("active"));
+    if(current) current.a.classList.add("active");
+  }
+
+  function onScroll(){ if(!ticking){ ticking=true; requestAnimationFrame(update); } }
+  window.addEventListener("scroll",onScroll,{passive:true});
+  window.addEventListener("resize",onScroll);
+  window.addEventListener("load",update);
+  update();
+})();
+
+/* theme toggle — defaults to light; remembers the visitor's choice */
+(function(){
+  const root=document.documentElement;
+  const btn=document.getElementById("themeToggle");
+  function setTheme(t){
+    root.setAttribute("data-theme",t);
+    if(btn){ btn.textContent = t==="dark" ? "☀" : "☾";
+      btn.title = t==="dark" ? "Switch to light" : "Switch to dark"; }
+    try{ localStorage.setItem("theme",t); }catch(e){}
+  }
+  let start="light";
+  try{ const saved=localStorage.getItem("theme"); if(saved) start=saved; }catch(e){}
+  setTheme(start);
+  if(btn) btn.addEventListener("click",()=>setTheme(root.getAttribute("data-theme")==="dark"?"light":"dark"));
+})();
+</script>
+</body>
+</html>
