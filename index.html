@@ -6,6 +6,8 @@
 <title>Song Lab | Eric Song | Yale School of Medicine</title>
 <meta name="description" content="The Song Lab at Yale School of Medicine, led by Eric Song MD PhD, studies anatomical immunity: how lymphatic drainage and neuro-immune circuit architecture shape immune responses in the brain and the eye.">
 <meta name="author" content="Eric Song">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 
 <!-- ====================================================================
      SEARCH AND SHARING
@@ -113,7 +115,7 @@ a:hover{color:var(--accent-deep);}
 .topbar .wrap{display:flex;align-items:baseline;justify-content:space-between;gap:20px;padding:22px clamp(20px,5vw,56px) 10px;flex-wrap:wrap;}
 .brand{display:flex;flex-direction:row;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
 .brandtext{display:flex;flex-direction:column;gap:2px;}
-.brandmark{width:42px;height:42px;flex:none;display:block;}
+.brand .brandmark{width:42px;height:42px;flex:none;display:block;}
 .bm-dark{display:none;}
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .bm-light{display:none;}
@@ -215,6 +217,11 @@ h2.section-title{font-family:var(--serif);font-weight:600;font-size:clamp(1.6rem
   .person .reveal{display:none;}
   .person .blurb-static{display:block;}
 }
+.person.is-open .tile{border-style:dashed;}
+.person .tile img.ptile-logo{position:absolute;top:50%;left:50%;right:auto;bottom:auto;
+  transform:translate(-50%,-50%);width:86%;height:auto;object-fit:contain;opacity:.9;}
+.person.is-open .pname{color:var(--ink-soft);}
+.person.is-open .prole{color:var(--accent);}
 .join-note{margin-top:40px;font-size:1.05rem;color:var(--ink-soft);max-width:var(--measure);}
 
 /* ============ ALUMNI ============ */
@@ -604,7 +611,8 @@ const SITE = {
      it appears on hover (and as text on phones). */
   people:[
     { initials:"HH", name:"Hyojeong Ha",    role:"Postgraduate Associate, Lab Manager",
-      email:"hyojeong.ha@yale.edu", photo:"photos/hyojeong.jpg" },
+      email:"hyojeong.ha@yale.edu", photo:"photos/hyojeong.jpg",
+      blurb:"I love coffee!" },
     { initials:"JK", name:"Jeongsoo Kim PhD",   role:"Postdoctoral Fellow",
       email:"jeongsoo.kim@yale.edu", photo:"photos/jeongsoo.jpg",
       blurb:"Interested in how lymph nodes evolved." },
@@ -628,7 +636,9 @@ const SITE = {
       blurb:"Aspiring physician and obsessive foil fencer." },
     { initials:"CY", name:"Caleb Yeh",      role:"Undergraduate Researcher",
       email:"caleb.yeh@yale.edu", photo:"photos/caleb.jpg",
-      blurb:"I like basketball." }
+      blurb:"I like basketball." },
+    /* the open slot: shows the lab mark instead of a photo */
+    { logoTile:true, name:"Your name here", role:"Join us" }
   ],
   join:"We are hiring at every stage, and we especially want people who enjoy working across disciplines such as immunology, neuroscience, ophthalmology, vascular biology, and engineering. If that sounds like you, get in touch.",
 
@@ -664,8 +674,8 @@ const SITE = {
   ],
   cultureCredit: "Passed down to us by our own Dean, Nancy Brown.",
 
-  /* — Publications — SAMPLE entries; replace with real citations.
-       Wrap your own name in <b>…</b>. */
+  /* — Publications — newest first. Wrap your own name in <b>…</b> so it
+       stands out, and add 'url' to link the paper. */
   publications:[
     { year:"2024", venue:"Nature",
       title:"Compartmentalized ocular lymphatic system mediates eye-brain immunity",
@@ -813,11 +823,15 @@ set("[data-pi-card]", `
     </div>
   </div>`);
 
+const bmL=(document.querySelector(".brand .bm-light")||{}).src||"";
+const bmD=(document.querySelector(".brand .bm-dark")||{}).src||"";
 set("[data-people]", SITE.people.map(p=>`
-  <div class="person">
+  <div class="person${p.logoTile?" is-open":""}">
     <div class="tile" tabindex="0">
-      ${p.photo?`<img src="${p.photo}" alt="${p.name}">`:p.initials}
-      <span class="reveal">${p.blurb||""}</span>
+      ${p.logoTile
+        ? `<img class="ptile-logo bm-light" src="${bmL}" alt=""><img class="ptile-logo bm-dark" src="${bmD}" alt="">`
+        : (p.photo?`<img src="${p.photo}" alt="${p.name}">`:p.initials)}
+      ${p.logoTile?"":`<span class="reveal">${p.blurb||""}</span>`}
     </div>
     <div class="pname">${p.name}</div>
     <div class="prole">${p.role}</div>
@@ -858,22 +872,57 @@ set("[data-gallery]", (SITE.gallery||[]).map(g=>`
     ${g.caption?`<figcaption class="gcap">${g.caption}</figcaption>`:""}
   </figure>`).join(""));
 
-/* gallery arrows: scroll one card at a time, disable at the ends */
+/* gallery: a continuous loop. The cards are tripled (one hidden set on each
+   side) so the rail can always scroll smoothly in either direction; when the
+   viewer drifts into a clone set we silently re-centre, which is invisible
+   because it happens far from what is on screen. */
 (function(){
   const rail=document.getElementById("gallery");
   const prev=document.getElementById("galPrev"), next=document.getElementById("galNext");
   if(!rail||!prev||!next) return;
-  function step(){ const c=rail.querySelector(".gcard"); return c?c.getBoundingClientRect().width+10:320; }
-  function sync(){
-    const max=rail.scrollWidth-rail.clientWidth-2;
-    prev.disabled = rail.scrollLeft<=2;
-    next.disabled = rail.scrollLeft>=max;
+  const originals=[...rail.children];
+  if(originals.length<2) return;
+  originals.forEach((c,n)=>c.dataset.i=n);
+
+  const before=document.createDocumentFragment(), after=document.createDocumentFragment();
+  originals.forEach(c=>{
+    const a=c.cloneNode(true), b=c.cloneNode(true);
+    a.dataset.clone="1"; b.dataset.clone="1";
+    a.setAttribute("aria-hidden","true"); b.setAttribute("aria-hidden","true");
+    before.appendChild(a); after.appendChild(b);
+  });
+  rail.insertBefore(before, rail.firstChild);
+  rail.appendChild(after);
+
+  const setW=()=>rail.scrollWidth/3;
+  function instant(x){
+    const prior=rail.style.scrollBehavior;
+    rail.style.scrollBehavior="auto";
+    rail.scrollLeft=x;
+    void rail.offsetWidth;
+    rail.style.scrollBehavior=prior||"";
   }
+  function centre(){ instant(setW()); }
+  function step(){ const c=rail.querySelector(".gcard"); return c?c.getBoundingClientRect().width+10:320; }
+
+  // start on the real set
+  centre();
+  window.addEventListener("load",centre);
+  window.addEventListener("resize",centre);
+
+  // re-centre once the viewer has settled, only when well off-screen
+  let t=null;
+  rail.addEventListener("scroll",()=>{
+    clearTimeout(t);
+    t=setTimeout(()=>{
+      const w=setW();
+      if(rail.scrollLeft < w*0.5)       instant(rail.scrollLeft + w);
+      else if(rail.scrollLeft > w*1.5)  instant(rail.scrollLeft - w);
+    },140);
+  },{passive:true});
+
   prev.addEventListener("click",()=>{ rail.scrollLeft-=step(); });
   next.addEventListener("click",()=>{ rail.scrollLeft+=step(); });
-  rail.addEventListener("scroll",sync,{passive:true});
-  window.addEventListener("resize",sync);
-  sync();
 })();
 
 set("[data-address]", SITE.address.map(([k,v])=>
@@ -961,7 +1010,7 @@ document.querySelectorAll(".motif .edge").forEach((p,i)=>{
   const img=document.getElementById("lbImg"), cap=document.getElementById("lbCap");
   const close=document.getElementById("lbClose"), prev=document.getElementById("lbPrev"), next=document.getElementById("lbNext");
   let shots=[], i=0, lastFocus=null;
-  function collect(){ shots=[...document.querySelectorAll(".gframe.has")]; }
+  function collect(){ shots=[...document.querySelectorAll(".gcard:not([data-clone]) .gframe.has")]; }
   function show(n){
     if(!shots.length) return;
     i=(n+shots.length)%shots.length;
@@ -976,12 +1025,15 @@ document.querySelectorAll(".motif .edge").forEach((p,i)=>{
   collect();
   document.addEventListener("click",e=>{
     const f=e.target.closest(".gframe.has");
-    if(f){ collect(); open(shots.indexOf(f)); }
+    if(f){ collect(); const card=f.closest(".gcard");
+           open(card && card.dataset.i!==undefined ? +card.dataset.i : shots.indexOf(f)); }
   });
   document.addEventListener("keydown",e=>{
     const f=document.activeElement;
     if((e.key==="Enter"||e.key===" ")&&f&&f.classList&&f.classList.contains("has")){
-      e.preventDefault(); collect(); open(shots.indexOf(f));
+      e.preventDefault(); collect();
+      const card=f.closest(".gcard");
+      open(card && card.dataset.i!==undefined ? +card.dataset.i : shots.indexOf(f));
     }
     if(!box.classList.contains("on")) return;
     if(e.key==="Escape") hide();
