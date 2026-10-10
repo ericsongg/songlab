@@ -238,15 +238,24 @@ h2.section-title{font-family:var(--serif);font-weight:600;font-size:clamp(1.6rem
 .alumni .aafter .k{color:var(--ink-faint);}
 
 /* ============ SUPPORT / FUNDERS ============ */
-.funders{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:20px;max-width:900px;}
-.funder{display:grid;place-items:center;text-align:center;min-height:96px;padding:20px;
-  border:1px solid var(--rule);background:var(--paper-3);text-decoration:none;
-  font-family:var(--serif);font-size:1.02rem;color:var(--ink-soft);line-height:1.3;
-  transition:border-color .15s,color .15s;}
-a.funder:hover{border-color:var(--accent);color:var(--ink);}
-.funder img{max-width:100%;max-height:56px;height:auto;
-  filter:grayscale(1);opacity:.75;transition:filter .15s,opacity .15s;}
+.funders{display:flex;flex-wrap:wrap;align-items:center;
+  gap:clamp(30px,4.4vw,46px) clamp(32px,4.6vw,46px);max-width:900px;}
+.funder{display:inline-flex;align-items:center;text-decoration:none;
+  font-family:var(--serif);font-size:1rem;color:var(--ink-soft);line-height:1.3;}
+.funder img{width:auto;max-width:100%;display:block;
+  filter:grayscale(1);opacity:.72;transition:filter .15s,opacity .15s;}
 .funder:hover img{filter:grayscale(0);opacity:1;}
+@media (max-width:560px){ .funders{gap:26px 28px;} .funder img{max-height:46px;} }
+
+/* dark mode: no plates behind the marks any more, so flip them to a negative —
+   dark line art becomes light and stays readable on the dark page */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .funder img{filter:grayscale(1) invert(1);opacity:.78;}
+  :root:not([data-theme="light"]) .funder:hover img{filter:grayscale(1) invert(1);opacity:1;}
+}
+:root[data-theme="dark"] .funder img{filter:grayscale(1) invert(1);opacity:.78;}
+:root[data-theme="dark"] .funder:hover img{filter:grayscale(1) invert(1);opacity:1;}
+
 
 /* ============ RULES OF ENGAGEMENT ============ */
 .rules{list-style:none;margin:0;padding:0;max-width:62ch;}
@@ -284,13 +293,7 @@ a.funder:hover{border-color:var(--accent);color:var(--ink);}
 
 /* dark mode: these logos are drawn for light backgrounds, so give them one */
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) .funder{background:#CFC9BE;border-color:#3B353A;}
-  :root:not([data-theme="light"]) .funder img{opacity:.82;}
-  :root:not([data-theme="light"]) .funder:hover img{opacity:1;}
 }
-:root[data-theme="dark"] .funder{background:#CFC9BE;border-color:#3B353A;}
-:root[data-theme="dark"] .funder img{opacity:.82;}
-:root[data-theme="dark"] .funder:hover img{opacity:1;}
 
 /* ============ LAB LIFE (horizontal gallery) ============ */
 .gal-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:26px;}
@@ -525,6 +528,7 @@ footer a:hover{color:var(--accent);}
   <section class="section" id="support">
     <div class="wrap">
       <h2 class="section-title" data-support-title></h2>
+      <p class="lede" data-support-sub></p>
       <div class="funders" data-funders></div>
     </div>
   </section>
@@ -726,15 +730,20 @@ const SITE = {
        line and the funder's name shows as text instead. Add a 'url' to
        make the tile link to that funder's site. */
   supportTitle:"Generous support from",
+  supportSub:"With thanks to everyone who has supported our work, past and present.",
   funders:[
-    { name:"Yale School of Medicine",             logo:"logos/yale.png",        url:"" },
-    { name:"National Institutes of Health",       logo:"logos/nih.png",         url:"" },
-    { name:"ARPA-H",                              logo:"logos/arpa-h.png",      url:"" },
-    { name:"Burroughs Wellcome Fund",             logo:"logos/bwf.png",         url:"" },
-    { name:"Blavatnik Fund for Innovation at Yale", logo:"logos/blavatnik.png", url:"" },
-    { name:"Mission BioCapital",                  logo:"logos/mission-bio.png", url:"" },
-    { name:"Aligning Science Across Parkinson's", logo:"logos/asap.png",        url:"" },
-    { name:"Rho Bio",                             logo:"logos/rho-bio.png",     url:"" }
+    /* 'h' is the display height in px. These logos differ a lot in shape and in
+       how much ink they carry, so equal heights would look unbalanced; these are
+       tuned so each reads with about the same visual weight. */
+    { name:"Yale School of Medicine",             logo:"logos/yale.png",        h:50, url:"" },
+    { name:"National Institutes of Health",       logo:"logos/nih.png",         h:60, url:"" },
+    { name:"ARPA-H",                              logo:"logos/arpa-h.png",      h:48, url:"" },
+    { name:"Burroughs Wellcome Fund",             logo:"logos/bwf.png",         h:60, url:"" },
+    { name:"Blavatnik Fund for Innovation at Yale", logo:"logos/blavatnik.png", h:44, url:"" },
+    { name:"Paul & Daisy Soros Fellowships",      logo:"logos/soros.png",       h:46, url:"" },
+    { name:"Mission BioCapital",                  logo:"logos/mission-bio.png", h:54, url:"" },
+    { name:"Rho Bio",                             logo:"logos/rho-bio.png",     h:38, url:"" },
+    { name:"Aligning Science Across Parkinson's", logo:"logos/asap.png",        h:40, url:"" }
   ],
 
   /* — Lab life — photos of events, retreats, celebrations.
@@ -855,11 +864,14 @@ set("[data-news]", SITE.news.map(n=>`
   <li><span class="date">${n.date}</span><p class="item">${n.item}</p></li>`).join(""));
 
 set("[data-support-title]", SITE.supportTitle);
+set("[data-support-sub]", SITE.supportSub || "");
 set("[data-funders]", (SITE.funders||[]).map(f=>{
-  const inner = f.logo ? `<img src="${f.logo}" alt="${f.name}">` : `<span>${f.name}</span>`;
+  const inner = f.logo
+    ? `<img src="${f.logo}" alt="${f.name}"${f.h?` style="height:${f.h}px"`:""}>`
+    : `<span>${f.name}</span>`;
   return f.url
-    ? `<a class="funder" href="${f.url}" target="_blank" rel="noopener">${inner}</a>`
-    : `<div class="funder">${inner}</div>`;
+    ? `<a class="funder" href="${f.url}" target="_blank" rel="noopener" title="${f.name}">${inner}</a>`
+    : `<div class="funder" title="${f.name}">${inner}</div>`;
 }).join(""));
 
 set("[data-gallery-title]", SITE.galleryTitle || "Lab life");
